@@ -14,7 +14,7 @@ namespace ScoreCardRebuild
 
             var scoreCard = new ScoreCard(scores);
 
-            Console.WriteLine(scoreCard.GameScore);
+            Console.WriteLine(scoreCard.GameScore());
 
             Console.ReadKey();
         }

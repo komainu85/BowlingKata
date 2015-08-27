@@ -21,7 +21,7 @@ namespace Tests
         [Test]
         public void CleanSheet()
         {
-            WhenScoreCard("3,/|3,/|3,/|3,/|3,/|3,/|3,/|3,/|3,/|3,/,X").ScoreEquals(137);
+            WhenScoreCard("5,/|5,/|5,/|5,/|5,/|5,/|5,/|5,/|5,/|5,/,5").ScoreEquals(150);
         }
 
         [Test]
@@ -29,6 +29,20 @@ namespace Tests
         {
             WhenScoreCard("3,/|X|3,/|X|3,/|X|3,/|X|3,/|X,3,/")
                 .ScoreEquals(200);
+        }
+
+        [Test]
+        public void AverageGame()
+        {
+            WhenScoreCard("2,3|7,2|X|4,2|7,2|X|3,/|3,2|X|X,8,2")
+                .ScoreEquals(131);
+        }
+
+        [Test]
+        public void NoStrikes()
+        {
+            WhenScoreCard("1,2|8,1|3,2|3,2|3,4|9,0|3,4|1,3|4,3|4,3")
+                .ScoreEquals(63);
         }
 
         private static TestScoreCard WhenScoreCard(string scoreCard)

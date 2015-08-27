@@ -19,12 +19,12 @@ namespace Tests
 
         public int Score()
         {
-            return ScoreCard.GameScore;
+            return ScoreCard.GameScore();
         }
 
         public void ScoreEquals(int expected)
         {
-             NUnit.Framework.Assert.AreEqual(Score(),expected);
+             NUnit.Framework.Assert.AreEqual(expected,Score());
         }
     }
 }

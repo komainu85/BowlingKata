@@ -24,14 +24,14 @@ namespace ScoreCardRebuild
             return frame;
         }
 
-        private bool IsStrike(List<Ball> balls)
+        private bool IsStrike(IEnumerable<Ball> balls)
         {
             return balls.First().Pins == MaxFrameScore;
         }
 
         private bool ISpare(List<Ball> balls)
         {
-            bool spare= false;
+            bool spare = false;
 
             if (balls.Count > 1)
             {
@@ -43,5 +43,7 @@ namespace ScoreCardRebuild
 
             return spare;
         }
+
+
     }
 }
