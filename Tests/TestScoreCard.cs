@@ -19,7 +19,7 @@ namespace Tests
 
         public int Score()
         {
-            return ScoreCard.Score;
+            return ScoreCard.GameScore;
         }
 
         public void ScoreEquals(int expected)

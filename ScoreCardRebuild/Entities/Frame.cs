@@ -7,11 +7,11 @@ namespace ScoreCardRebuild.Entities
     {
         public List<Ball> Balls { get; set; } = new List<Ball>();
 
-        public bool Strike => Balls.Any() && Balls.First().Pins == 10;
+        public bool Strike { get; set; }
 
-        public bool Spare => Balls.Count > 1 && Balls[0].Pins + Balls[1].Pins == 10;
+        public bool Spare { get; set; }
 
-        public bool FinalFrame => FrameNumber == 10;
+        public bool FinalFrame { get; set; }
 
         public int FrameNumber { get; set; }
 
