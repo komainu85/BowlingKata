@@ -35,7 +35,7 @@ namespace Tests
         public void AverageGame()
         {
             WhenScoreCard("2,3|7,2|X|4,2|7,2|X|3,/|3,2|X|X,8,2")
-                .ScoreEquals(131);
+                .ScoreEquals(133);
         }
 
         [Test]

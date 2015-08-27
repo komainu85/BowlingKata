@@ -7,8 +7,7 @@ namespace ScoreCardRebuild
 {
     public class ScoreCard
     {
-        public int MaxScore = 10;
-        readonly FrameManager _frameManager = new FrameManager();
+        public int MaxFrameScore = 10;
 
         public List<Frame> Frames { get; set; } = new List<Frame>();
 
@@ -18,7 +17,7 @@ namespace ScoreCardRebuild
 
             for (int i = 0; i < framesString.Length; i++)
             {
-                List<Ball> balls = new List<Ball>();
+                List<int> balls = new List<int>();
 
                 string[] ballsString = framesString[i].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -28,68 +27,82 @@ namespace ScoreCardRebuild
                 {
                     var score = ParseBallInput(ball, previousBallScore);
 
-                    balls.Add(new Ball(score));
+                    balls.Add(score);
                     previousBallScore = score;
                 }
 
-                Frame frame = _frameManager.CreateFrame(i + 1, balls);
+                Frame frame = new Frame(balls, i + 1);
                 Frames.Add(frame);
             }
         }
 
         public int GameScore()
         {
-            int frameScore = 0;
+            Score gameScore = new Score();
 
             for (int i = 0; i < Frames.Count; i++)
             {
-                if (Frames[i].Strike)
+                if (Frames[i].IsStrike())
                 {
-                    List<Ball> balls = GetBalls(Frames, i, 2, 1);
-                    frameScore += 10 + GetBallsScore(balls);
+                    gameScore.AddBallScore(10);
+                    gameScore.AddNextTwoBallScores(SecondBallScore(i), ThirdBallScore(i));
                 }
-                else if (Frames[i].Spare)
+                else if (Frames[i].IsSpare())
                 {
-                    List<Ball> balls = GetBalls(Frames, i, 1, 2);
-                    frameScore += 10 + GetBallsScore(balls);
+                    gameScore.AddBallScore(10);
+                    gameScore.AddNextBallScore(SecondBallScore(i));
                 }
                 else
                 {
-                    frameScore += Frames[i].Balls[0].Pins + Frames[i].Balls[1].Pins;
+                    gameScore.AddBallScore(Frames[i].GetBallScore(0));
+                    gameScore.AddBallScore(Frames[i].GetBallScore(1));
                 }
             }
-
-            return frameScore;
+            return gameScore.GetFinalScore();
         }
 
-        public List<Ball> GetBalls(List<Frame> frames, int frameIndex, int ballCount, int offset)
+        public int SecondBallScore(int frameIndex)
         {
-            List<Ball> balls = new List<Ball>();
+            int ballScore = 0;
 
-            for (int i = 0; i < ballCount; i++)
+            if (Frames[frameIndex].IsFinalFrame())
             {
-                if (frames[frameIndex].Balls.Count >= i + 1 + offset)
+                ballScore = Frames[frameIndex].GetBallScore(1);
+            }
+            else
+            {
+                ballScore = Frames[frameIndex + 1].GetBallScore(0);
+            }
+
+            return ballScore;
+
+        }
+
+        public int ThirdBallScore(int frameIndex)
+        {
+            int ballScore = 0;
+
+            if (Frames[frameIndex].IsFinalFrame())
+            {
+                ballScore = Frames[frameIndex].GetBallScore(2);
+            }
+            else
+            {
+                if (Frames[frameIndex + 1].IsStrike())
                 {
-                    Ball ball = frames[frameIndex].Balls[i + offset];
-                    balls.Add(ball);
+                    ballScore = 10;
                 }
                 else
                 {
-                    frameIndex += 1;
-
-                    Ball ball = frames[frameIndex].Balls[0];
-                    balls.Add(ball);
-                    offset = 0;
+                    ballScore = Frames[frameIndex+1].GetBallScore(1);
                 }
+
             }
 
-            return balls;
+            return ballScore;
         }
 
-        public int GetBallsScore(List<Ball> balls)
-        {
-            return balls.Sum(x => x.Pins);
-        }
+
 
         private int ParseBallInput(string ball, int previousBallScore)
         {
@@ -97,11 +110,11 @@ namespace ScoreCardRebuild
 
             if (ball == "X")
             {
-                score = MaxScore;
+                score = MaxFrameScore;
             }
             else if (ball == "/")
             {
-                score = MaxScore - previousBallScore;
+                score = MaxFrameScore - previousBallScore;
             }
             else
             {

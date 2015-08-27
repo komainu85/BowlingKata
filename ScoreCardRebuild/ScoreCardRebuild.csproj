@@ -43,10 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\Ball.cs" />
     <Compile Include="Bowling.cs" />
-    <Compile Include="Entities\Frame.cs" />
-    <Compile Include="FrameManager.cs" />
+    <Compile Include="Frame.cs" />
+    <Compile Include="Score.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScoreCard.cs" />
