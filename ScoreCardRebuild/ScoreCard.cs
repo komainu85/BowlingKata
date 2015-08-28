@@ -9,7 +9,7 @@ namespace ScoreCardRebuild
     {
         public int MaxFrameScore = 10;
 
-        public List<Frame> Frames { get; set; } = new List<Frame>();
+        private List<Frame> _frames = new List<Frame>();
 
         public ScoreCard(string scoreCard)
         {
@@ -31,8 +31,8 @@ namespace ScoreCardRebuild
                     previousBallScore = score;
                 }
 
-                Frame frame = new Frame(balls, i + 1);
-                Frames.Add(frame);
+                Frame frame = new Frame(balls, i + 1 == framesString.Length);
+                _frames.Add(frame);
             }
         }
 
@@ -40,22 +40,26 @@ namespace ScoreCardRebuild
         {
             Score gameScore = new Score();
 
-            for (int i = 0; i < Frames.Count; i++)
+            for (int i = 0; i < _frames.Count; i++)
             {
-                if (Frames[i].IsStrike())
+                if (_frames[i].IsStrike())
                 {
                     gameScore.AddBallScore(10);
                     gameScore.AddNextTwoBallScores(SecondBallScore(i), ThirdBallScore(i));
                 }
-                else if (Frames[i].IsSpare())
+                else if (_frames[i].IsSpare())
                 {
                     gameScore.AddBallScore(10);
                     gameScore.AddNextBallScore(SecondBallScore(i));
                 }
                 else
                 {
-                    gameScore.AddBallScore(Frames[i].GetBallScore(0));
-                    gameScore.AddBallScore(Frames[i].GetBallScore(1));
+                    gameScore.AddBallScore(_frames[i].GetBallScore(0));
+
+                    if (_frames[i].BallCount() > 1)
+                    {
+                        gameScore.AddBallScore(_frames[i].GetBallScore(1));
+                    }
                 }
             }
             return gameScore.GetFinalScore();
@@ -65,36 +69,46 @@ namespace ScoreCardRebuild
         {
             int ballScore = 0;
 
-            if (Frames[frameIndex].IsFinalFrame())
+            if (_frames[frameIndex].IsFinalFrame() && _frames[frameIndex].IsSpare())
             {
-                ballScore = Frames[frameIndex].GetBallScore(1);
+                ballScore = _frames[frameIndex].GetBallScore(2);
             }
-            else
+            else if (_frames[frameIndex].IsFinalFrame())
             {
-                ballScore = Frames[frameIndex + 1].GetBallScore(0);
+                ballScore = _frames[frameIndex].GetBallScore(1);
+            }
+            else if (IsThereNextAFrame(frameIndex))
+            {
+                ballScore = _frames[frameIndex + 1].GetBallScore(0);
             }
 
             return ballScore;
-
         }
 
         public int ThirdBallScore(int frameIndex)
         {
             int ballScore = 0;
 
-            if (Frames[frameIndex].IsFinalFrame())
+            if (_frames[frameIndex].IsFinalFrame())
             {
-                ballScore = Frames[frameIndex].GetBallScore(2);
+                ballScore = _frames[frameIndex].GetBallScore(2);
             }
             else
             {
-                if (Frames[frameIndex + 1].IsStrike())
+                if (IsThereNextAFrame(frameIndex))
                 {
-                    ballScore = 10;
-                }
-                else
-                {
-                    ballScore = Frames[frameIndex+1].GetBallScore(1);
+                    if (_frames[frameIndex + 1].IsFinalFrame())
+                    {
+                        ballScore = _frames[frameIndex + 1].GetBallScore(2);
+                    }
+                   else if (_frames[frameIndex + 1].IsStrike())
+                    {
+                        ballScore = _frames[frameIndex + 2].GetBallScore(0);
+                    }
+                    else if (_frames[frameIndex + 1].BallCount() > 1)
+                    {
+                        ballScore = _frames[frameIndex + 1].GetBallScore(1);
+                    }
                 }
 
             }
@@ -102,7 +116,10 @@ namespace ScoreCardRebuild
             return ballScore;
         }
 
-
+        private bool IsThereNextAFrame(int frameIndex)
+        {
+            return _frames.Count() >= frameIndex + 2;
+        }
 
         private int ParseBallInput(string ball, int previousBallScore)
         {

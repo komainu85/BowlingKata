@@ -6,13 +6,13 @@ namespace ScoreCardRebuild.Entities
 {
     public class Frame
     {
-        private List<int> _ballScores;
-        private int _frameNumber;
+        private IReadOnlyList<int> _ballScores;
+        private bool _finalFrame;
 
-        public Frame(List<int> ballScores, int frameNumber)
+        public Frame(IReadOnlyList<int> ballScores, bool finalFrame)
         {
             _ballScores = ballScores;
-            _frameNumber = frameNumber;
+            _finalFrame = finalFrame;
         }
 
         public bool IsStrike()
@@ -37,12 +37,26 @@ namespace ScoreCardRebuild.Entities
 
         public bool IsFinalFrame()
         {
-            return _frameNumber == 10;
+            return _finalFrame;
         }
 
         public int GetBallScore(int ballIndex)
         {
-            return _ballScores[ballIndex];
+            int ballScore = 0;
+
+            if (BallCount() >= ballIndex + 1)
+            {
+
+                ballScore = _ballScores[ballIndex];
+            }
+
+            return ballScore;
         }
+
+        public int BallCount()
+        {
+            return _ballScores.Count();
+        }
+
     }
 }
